@@ -1,162 +1,54 @@
 # Global variables
-ARG ALPINE_VERSION="3.23.2" \
-    IMAGE_VERSION="1.0.0" \
-    DNSDIST_VERSION="2.0.2"
-
-# -----------------------------------------------------------------------------------------------
+ARG DEBIAN_VERSION="13.3-slim" \
+    DNSDIST_VERSION="2.0.2" \
+    IMAGE_VERSION="1.0.0"
 
 # https://www.dnsdist.org/install.html#installing-from-source
-# Set Alpine as the base image
-FROM alpine:${ALPINE_VERSION} AS dnsdist-builder
+# Set Debian as the base image
+FROM debian:${DEBIAN_VERSION} AS dnsdist
 
 # Build arguments
-ARG ALPINE_VERSION \
+ARG DEBIAN_VERSION \
     DNSDIST_VERSION \
-    DNSDIST_DOWNLOAD="https://downloads.powerdns.com/releases/dnsdist-${DNSDIST_VERSION}.tar.xz" \
-    QUICHE_DOWNLOAD="https://github.com/cloudflare/quiche"
-
-# Set shell to ash
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
-
-# Install runtime dependencies
-RUN apk update && \
-    apk add --no-cache --virtual .build-deps \
-      build-base=~0.5 \
-      pkgconf=~2.5.1 \
-      cmake=~4.1.3 \
-      curl=~8.17.0 \
-      git=~2.52.0 \
-      gpg=~2.4.9 \
-      boost-dev=~1.84.0 \
-      lua5.4-dev=~5.4.8 \
-      libedit-dev=~20251016.3.1 \
-      libevent-dev=~2.1.12 \
-      fstrm-dev=~0.6.1 \
-      libbpf-dev=~1.6.2 \
-      libxdp-dev=~1.5.7 \
-      libcap-dev=~2.77 \
-      libsodium-dev=~1.0.20 \
-      protobuf-c-dev=~1.5.2 \
-      fontconfig-dev=~2.17.1 \
-      py3-yaml=~6.0.3 \
-      clang-static=~21.1.2 \
-      lmdb-dev=~0.9.33 \
-      net-snmp-dev=~5.9.4 \
-      nghttp2-dev=~1.68.0 \
-      openssl-dev=~3.5.4 \
-      re2-dev=~2025.11.05 &&\
-    # Clean up apk cache
-    rm -rf /var/cache/apk/* && \
-    # Install newest Rust and Cargo version (for quiche, DoQ and DoH3)
-    curl --proto '=https' --tlsv1.3 -sSf https://sh.rustup.rs | sh -s -- -y && \
-    # Add Rust to PATH
-    export PATH="$HOME/.cargo/bin:$PATH"
-
-# Set workdir
-WORKDIR /tmp/quiche-build
-
-# Download quiche for DNS over HTTP/3 and DNS over QUIC support
-RUN git clone --recursive "${QUICHE_DOWNLOAD}" .
-
-# Patch msghdr error
-# See: https://github.com/cloudflare/quiche/pull/2224
-COPY files/mmsg.rs /tmp/quiche-build/datagram-socket/src/mmsg.rs
-
-# Build quiche
-# Error: Unable to find libclang: "the `libclang` shared library at /usr/lib/llvm20/lib/libclang.so.20.1.8 could not be opened: Dynamic loading not supported"
-# See: https://akisame.xyz/blog/20251104-rust-on-alpine-linux/
-RUN export RUSTFLAGS="-C target-feature=-crt-static" && \
-    cargo build --release --package quiche --features ffi,pkg-config-meta
-
-# Set workdir
-WORKDIR /tmp/dnsdist-build
-
-# Download dnsdist source code and signature
-RUN curl -sSLO "${DNSDIST_DOWNLOAD}" && \
-    curl -sSLO "${DNSDIST_DOWNLOAD}.asc" && \
-    # Import GPG keys for dnsdist verification
-    gpg --keyserver keyserver.ubuntu.com --recv-keys 0xDCF513FA7EED19F3 0xA208ED4F8AF58446 0x6FFC33439B0D04DF 0xEACAB90B1963EC2B || true && \
-    # Automatically trust the imported keys
-    for fpr in $(gpg --list-keys --with-colons  | awk -F: '/fpr:/ {print $10}' | sort -u); do  echo -e "5\ny\n" |  gpg --command-fd 0 --expert --edit-key $fpr trust; done || true && \
-    # Verify the downloaded dnsdist tarball with GPG
-    gpg --verify "dnsdist-${DNSDIST_VERSION}.tar.xz.asc" "dnsdist-${DNSDIST_VERSION}.tar.xz" && \
-    # Extract dnsdist source code
-    tar -xf "dnsdist-${DNSDIST_VERSION}.tar.xz"
-
-# Set workdir
-WORKDIR /tmp/dnsdist-build/dnsdist-${DNSDIST_VERSION}
-
-# Build DNSdist
-RUN set -x && \
-    # Set environment variable for compilation
-    export PKG_CONFIG_PATH="/tmp/quiche-build/target/release:$PKG_CONFIG_PATH" && \
-    # Use static .a not shared .so libraries from quiche --> reduces runtime dependencies
-    export QUICHE_LIBS="/tmp/quiche-build/target/release/libquiche.a" && \
-    export QUICHE_CFLAGS="-I/tmp/quiche-build/quiche/include" && \
-    export LDFLAGS="-L/tmp/quiche-build/quiche/target/release" && \
-    # LUA flags
-    export LUA_CFLAGS=$(pkg-config --cflags lua5.4) && \
-    export LUA_LIBS=$(pkg-config --libs lua5.4) && \
-    # Error: xsk.hh:28:10: fatal error: bits/types/struct_timespec.h: No such file or directory
-    # Alpine uses <time.h>, not <bits/types/struct_timespec.h>
-    sed -i 's|<bits/types/struct_timespec.h>|<time.h>|' xsk.hh && \
-    # Error: '__uint8_t' does not name a type; did you mean 'uint8_t'?
-    # Alpine/musl uses uint8_t
-    sed -i 's/__uint8_t/uint8_t/g' xsk.cc && \
-    # Configure dnsdist
-    ./configure \
-        --sysconfdir=/etc/dnsdist \
-        --disable-dependency-tracking \
-        --enable-fast-install \
-        --enable-dnstap \
-        --enable-dnscrypt \
-        --enable-dns-over-tls \
-        --enable-dns-over-https \
-        --enable-dns-over-quic \
-        --enable-dns-over-http3 \
-        --enable-yaml \
-        --enable-ipcipher \
-        --with-libsodium \
-        --with-quiche \
-        --with-libedit \
-        --with-re2 \
-        --with-xsk \
-        --with-net-snmp \
-        --with-libcap \
-        --with-service-user \
-        --with-lua \
-        --with-libssl \
-        --with-nghttp2 \
-        --with-lmdb \
-        --with-service-user=dnsdist \
-        --with-service-group=dnsdist && \
-    # Compile and install DNSdist
-    make && \
-    make install
-
-# -----------------------------------------------------------------------------------------------
-
-# Set Alpine as the base image
-FROM alpine:${ALPINE_VERSION} AS dnsdist
-
-# Build arguments
-ARG ALPINE_VERSION \
     IMAGE_VERSION
 
 # Set environment variables
-    # Set Timezone
-ENV TZ="Europe/Vienna" \
-    # DNSdist Path
-    DNSDIST_EXECUTABLE_PATH="/usr/bin/dnsdist"
+ENV TZ="Europe/Vienna"
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD nslookup -type=NS -timeout=1 -retry=1 . 127.0.0.1 || exit 1
+
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl=8.14.1-2+deb13u2 \
+        gpg=2.4.7-21+deb13u1+b1 \
+        ca-certificates=20250419 \
+        bind9-dnsutils=1:9.20.15-1~deb13u1 \
+        adduser=3.152 \
+        procps=2:4.0.4-9 \
+        tini=0.19.0-3+b5 \
+        tzdata=2025b-4+deb13u1
+
+# Install dnsdist from PowerDNS repository
+    # Add PowerDNS GPG key
+RUN install -d /etc/apt/keyrings; curl https://repo.powerdns.com/FD380FBB-pub.asc | \
+      tee /etc/apt/keyrings/dnsdist-20-pub.asc > /dev/null && \
+    # Add PDNS repository
+    # https://repo.powerdns.com/
+    echo "deb [signed-by=/etc/apt/keyrings/dnsdist-20-pub.asc] http://repo.powerdns.com/debian trixie-dnsdist-20 main" \
+      > /etc/apt/sources.list.d/pdns.list && \
+    # Set package pinning to prefer PowerDNS packages
+    printf "Package: dnsdist*\nPin: origin repo.powerdns.com\nPin-Priority: 600" > /etc/apt/preferences.d/dnsdist-20 && \
+    # Install dnsdist from PowerDNS repository
+    apt-get update && \
+    apt-get install -y --no-install-recommends dnsdist=2.0.2-1pdns.debian13 && \
+    # Clean up
+    apt-get clean
 
 # Set working directory
 WORKDIR /etc/dnsdist
-
-# Copy Pimsync from the build stage 
-COPY --from=dnsdist-builder /usr/local/bin/dnsdist /usr/local/bin/dnsdist
-
-# Copy the Pimsync manual pages
-COPY --from=dnsdist-builder /usr/local/share/man /usr/local/share/man
 
 # Set build date argument here, because caching would break otherwise
 # It is set during the build process in the reusable workflow
@@ -174,8 +66,8 @@ LABEL org.opencontainers.image.authors="Bleala" \
       org.opencontainers.image.source="https://github.com/Bleala/DNSdist-DOCKERIZED"
 
 # DNS
-EXPOSE 53/udp
 EXPOSE 53/tcp
+EXPOSE 53/udp
 # DNS over HTTPS
 EXPOSE 443/tcp
 # DNS over HTTP/3
@@ -193,3 +85,5 @@ EXPOSE 8443/tcp
 EXPOSE 8443/udp
 
 # Run dnsdist
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/bin/dnsdist"]
+CMD ["--supervised", "--disable-syslog", "--uid", "_dnsdist", "--gid", "_dnsdist", "-C", "/etc/dnsdist/dnsdist.yml"]
