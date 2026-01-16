@@ -25,6 +25,7 @@ RUN apt-get update && \
         curl=8.14.1-2+deb13u2 \
         gpg=2.4.7-21+deb13u1+b1 \
         ca-certificates=20250419 \
+        openssl=3.5.4-1~deb13u1 \
         bind9-dnsutils=1:9.20.15-1~deb13u1 \
         adduser=3.152 \
         procps=2:4.0.4-9 \
