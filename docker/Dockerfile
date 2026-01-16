@@ -32,7 +32,6 @@ RUN apk update && \
       libedit-dev=~20251016.3.1 \
       libevent-dev=~2.1.12 \
       fstrm-dev=~0.6.1 \
-      # gnutls-dev=~3.8.11 \
       libbpf-dev=~1.6.2 \
       libxdp-dev=~1.5.7 \
       libcap-dev=~2.77 \
