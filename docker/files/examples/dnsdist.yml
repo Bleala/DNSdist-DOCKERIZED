@@ -1,0 +1,72 @@
+---
+# https://www.dnsdist.org/reference/yaml-settings.html
+backends:
+  - address: "1.1.1.1"
+    name: "cloudflare"
+    protocol: Do53
+
+  - address: "8.8.8.8"
+    name: "google"
+    protocol: Do53
+
+load_balancing_policies:
+  default_policy: "firstAvailable"
+
+binds:
+  - listen_address: "0.0.0.0"
+    protocol: "Do53"
+
+  - listen_address: "0.0.0.0"
+    protocol: "DoH"
+    tls:
+      certificates:
+        - certificate: "/etc/dnsdist/dnsdist.crt"
+          key: "/etc/dnsdist/dnsdist.key"
+    doh:
+      provider: "nghttp2"
+      paths:
+        - "/dns-query"
+      custom_response_headers:
+        - key: "alt-svc"
+          value: "h3=\":443\""
+
+  - listen_address: "0.0.0.0"
+    protocol: "DoT"
+    tls:
+      certificates:
+        - certificate: "/etc/dnsdist/dnsdist.crt"
+          key: "/etc/dnsdist/dnsdist.key"
+
+  - listen_address: "0.0.0.0"
+    protocol: "DoH3"
+    tls:
+      certificates:
+        - certificate: "/etc/dnsdist/dnsdist.crt"
+          key: "/etc/dnsdist/dnsdist.key"
+    quic:
+      congestion_control_algorithm: "bbr"
+
+  - listen_address: "0.0.0.0"
+    protocol: "DoQ"
+    tls:
+      certificates:
+        - certificate: "/etc/dnsdist/dnsdist.crt"
+          key: "/etc/dnsdist/dnsdist.key"
+    quic:
+      congestion_control_algorithm: "bbr"
+
+webserver:
+  listen_addresses:
+    - "0.0.0.0:8083"
+  password: "ChangeMe!"
+  api_key: "ChangeMe!"
+  acl:
+    - "127.0.0.1/32"
+    - "192.168.0.0/16"
+
+console:
+  listen_address: "0.0.0.0:5199"
+  key: "apfVE9JRPeBZC8/tWvpcXvhOrsxroHRtmmWmcHjk8eA="
+  acl:
+    - "127.0.0.1/32"
+    - "192.168.0.0/16"
