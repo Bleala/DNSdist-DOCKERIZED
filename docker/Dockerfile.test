@@ -74,9 +74,7 @@ RUN export RUSTFLAGS="-C target-feature=-crt-static" && \
 
 RUN mkdir -p /usr/local/include /usr/local/lib/pkgconfig && \
     cp -v quiche/include/quiche.h /usr/local/include/ && \
-    # WICHTIG: Wir kopieren die .so Datei (Shared Lib)!
     cp -v target/release/deps/libquiche.so /usr/local/lib/ && \
-    # Wir erstellen die .pc Datei neu, angepasst auf /usr/local
     printf "prefix=/usr/local\n\
 exec_prefix=\${prefix}\n\
 libdir=\${exec_prefix}/lib\n\
