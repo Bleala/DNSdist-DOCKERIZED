@@ -8,7 +8,8 @@ ARG DEBIAN_VERSION="13.3-slim" \
 FROM debian:${DEBIAN_VERSION} AS dnsdist
 
 # Build arguments
-ARG DEBIAN_VERSION \
+ARG DEBIAN_FRONTEND="noninteractive" \
+    DEBIAN_VERSION \
     DNSDIST_VERSION \
     IMAGE_VERSION
 
