@@ -1,0 +1,113 @@
+---
+networks:
+  dnsdist:
+    name: dnsdist
+    driver: bridge
+
+services:
+  # DNSdist - a highly DNS-, DoS- and abuse-aware loadbalancer.
+  # https://www.dnsdist.org/index.html
+  # https://www.dnsdist.org/reference/yaml-settings.html
+  # https://github.com/Bleala/DNSdist-DOCKERIZED
+  # https://hub.docker.com/r/bleala/dnsdist
+  dnsdist:
+    image: bleala/dnsdist:latest
+    container_name: dnsdist
+    hostname: dnsdist
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    sysctls:
+      # Allow TCP Fast Open
+      net.ipv4.tcp_fastopen: 3
+    env_file:
+      - path: .env
+        required: true
+    networks:
+      dnsdist: {}
+    ports:
+      # DNS TCP
+      - name: dnsdist-dns-tcp
+        target: 53
+        published: 53
+        host_ip: 0.0.0.0
+        protocol: tcp
+        app_protocol: dns
+        mode: host
+      # DNS UDP
+      - name: dnsdist-dns-udp
+        target: 53
+        published: 53
+        host_ip: 0.0.0.0
+        protocol: udp
+        app_protocol: dns
+        mode: host
+      # DoH
+      - name: dnsdist-doh
+        target: 443
+        published: xxxxx
+        host_ip: 0.0.0.0
+        protocol: tcp
+        app_protocol: https
+        mode: host
+      # DoH3
+      - name: dnsdist-doh3
+        target: 443
+        published: xxxxx
+        host_ip: 0.0.0.0
+        protocol: udp
+        app_protocol: https
+        mode: host
+      # DoQ
+      - name: dnsdist-doq-udp
+        target: 853
+        published: 853
+        host_ip: 0.0.0.0
+        protocol: udp
+        app_protocol: quic
+        mode: host
+      # DoT
+      - name: dnsdist-dot-tcp
+        target: 853
+        published: 853
+        host_ip: 0.0.0.0
+        protocol: tcp
+        app_protocol: dot
+        mode: host
+        # # Console
+        # - name: dnsdist-console
+        #   target: 5199
+        #   published: xxxxx
+        #   host_ip: 0.0.0.0
+        #   protocol: tcp
+        #   app_protocol: http
+        #   mode: host
+        # # Web UI
+        # - name: dnsdist-web-ui
+        #   target: 8083
+        #   published: xxxxx
+        #   host_ip: 0.0.0.0
+        #   protocol: tcp
+        #   app_protocol: http
+        #   mode: host
+      # DNSCrypt TCP
+      - name: dnsdist-dnscrypt-tcp
+        target: 8443
+        published: 8443
+        host_ip: 0.0.0.0
+        protocol: tcp
+        app_protocol: dnscrypt
+        mode: host
+      # DNSCrypt UDP
+      - name: dnsdist-dnscrypt-tcp
+        target: 8443
+        published: 8443
+        host_ip: 0.0.0.0
+        protocol: udp
+        app_protocol: dnscrypt
+        mode: host
+    volumes:
+      - type: bind
+        source: $DOCKERDIR/dnsdist.yml
+        target: /etc/dnsdist/dnsdist.yml
+        read_only: true
