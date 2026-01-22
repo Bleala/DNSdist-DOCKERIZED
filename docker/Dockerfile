@@ -8,9 +8,13 @@ ARG DEBIAN_VERSION="13.3-slim" \
 FROM debian:${DEBIAN_VERSION} AS dnsdist
 
 # Build arguments
-ARG DEBIAN_VERSION \
+ARG DEBIAN_FRONTEND="noninteractive" \
+    DEBIAN_VERSION \
     DNSDIST_VERSION \
     IMAGE_VERSION
+
+# Set shell options
+SHELL ["/bin/bash", "-e", "-u", "-x", "-o", "pipefail", "-c"]
 
 # Set environment variables
 ENV TZ="Europe/Vienna"
@@ -30,7 +34,11 @@ RUN apt-get update && \
         adduser=3.152 \
         procps=2:4.0.4-9 \
         tini=0.19.0-3+b5 \
-        tzdata=2025b-4+deb13u1
+        tzdata=2025b-4+deb13u1 && \
+    # Clean up
+    apt-get clean && \
+    # Delete apt lists
+    rm -rf /var/lib/apt/lists/*
 
 # Install dnsdist from PowerDNS repository
     # Add PowerDNS GPG key
@@ -46,7 +54,9 @@ RUN install -d /etc/apt/keyrings; curl https://repo.powerdns.com/FD380FBB-pub.as
     apt-get update && \
     apt-get install -y --no-install-recommends dnsdist=2.0.2-1pdns.debian13 && \
     # Clean up
-    apt-get clean
+    apt-get clean && \
+    # Delete apt lists
+    rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /etc/dnsdist
