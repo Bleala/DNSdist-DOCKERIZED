@@ -40,13 +40,13 @@ template: |
 
   ## 📦 Download
   Download at Docker Hub:
-  https://hub.docker.com/r/bleala/pimsync
+  https://hub.docker.com/r/bleala/dnsdist
 
   Download at Github Container Registry:
-  https://github.com/Bleala/DNSdist-DOCKERIZED/pkgs/container/pimsync
+  https://github.com/Bleala/DNSdist-DOCKERIZED/pkgs/container/dnsdist
 
   Download at Quay.io:
-  https://quay.io/repository/bleala/pimsync
+  https://quay.io/repository/bleala/dnsdist
 
   ## 🏷️ Versions
   * DNSdist:
