@@ -42,7 +42,7 @@ services:
         protocol: udp
         app_protocol: dns
         mode: host
-      # Web UI HTTPS / DoH
+      # DoH
       - name: dnsdist-doh
         target: 443
         published: xxxxx
