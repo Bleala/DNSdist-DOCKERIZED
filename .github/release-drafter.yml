@@ -31,8 +31,8 @@ categories:
     labels:
       - 'maintenance'
 template: |
-  # 🎉 Pimsync-DOCKERIZED Release $RESOLVED_VERSION!
-  A new version of Pimsync-DOCKERIZED is available!
+  # 🎉 DNSdist-DOCKERIZED Release $RESOLVED_VERSION!
+  A new version of DNSdist-DOCKERIZED is available!
 
   ## 📰 What's New/Changed
 
@@ -40,14 +40,14 @@ template: |
 
   ## 📦 Download
   Download at Docker Hub:
-  https://hub.docker.com/r/bleala/pimsync
+  https://hub.docker.com/r/bleala/dnsdist
 
   Download at Github Container Registry:
-  https://github.com/Bleala/Pimsync-DOCKERIZED/pkgs/container/pimsync
+  https://github.com/Bleala/DNSdist-DOCKERIZED/pkgs/container/dnsdist
 
   Download at Quay.io:
-  https://quay.io/repository/bleala/pimsync
+  https://quay.io/repository/bleala/dnsdist
 
   ## 🏷️ Versions
-  * Pimsync:
+  * DNSdist:
   * Alpine:
