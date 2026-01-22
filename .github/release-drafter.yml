@@ -50,4 +50,4 @@ template: |
 
   ## 🏷️ Versions
   * DNSdist:
-  * Alpine:
+  * Debian Slim:
