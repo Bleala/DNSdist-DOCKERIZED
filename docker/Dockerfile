@@ -1,7 +1,7 @@
 # Global variables
-ARG DEBIAN_VERSION="13.3-slim" \
+ARG DEBIAN_VERSION="13.4-slim" \
     DNSDIST_VERSION="2.0.2" \
-    IMAGE_VERSION="1.0.0"
+    IMAGE_VERSION="1.0.1"
 
 # https://www.dnsdist.org/install.html#installing-from-source
 # Set Debian as the base image
@@ -27,14 +27,14 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl=8.14.1-2+deb13u2 \
-        gpg=2.4.7-21+deb13u1+b1 \
+        gpg=2.4.7-21+deb13u1+b2 \
         ca-certificates=20250419 \
-        openssl=3.5.4-1~deb13u2 \
+        openssl=3.5.5-1~deb13u1 \
         bind9-dnsutils=1:9.20.18-1~deb13u1 \
         adduser=3.152 \
         procps=2:4.0.4-9 \
-        tini=0.19.0-3+b5 \
-        tzdata=2025b-4+deb13u1 && \
+        tini=0.19.0-3+b6 \
+        tzdata=2026a-0+deb13u1 && \
     # Clean up
     apt-get clean && \
     # Delete apt lists
