@@ -194,7 +194,7 @@ jobs:
 
           # Pin Trivy Version SHA
           # create with "sha256sum $FILENAME"
-          EXPECTED_HASH="a484057aafde31089cf2558ca0f79a4bc835125a5ee6834183a5bcf0735af358" 
+          EXPECTED_HASH="a484057aafde31089cf2558ca0f79a4bc835125a5ee6834183a5bcf0735af358"
           FILE_NAME="trivy_${TRIVY_VERSION}_Linux-64bit.deb"
           DOWNLOAD_URL="https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/${FILE_NAME}"
 
