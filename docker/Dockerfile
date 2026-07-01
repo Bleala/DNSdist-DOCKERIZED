@@ -1,6 +1,6 @@
 # Global variables
-ARG DEBIAN_VERSION="13.4-slim" \
-    DNSDIST_VERSION="2.0.2" \
+ARG DEBIAN_VERSION="13.5-slim" \
+    DNSDIST_VERSION="2.0.7" \
     IMAGE_VERSION="1.0.1"
 
 # https://www.dnsdist.org/install.html#installing-from-source
@@ -26,15 +26,15 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 # Install runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        curl=8.14.1-2+deb13u2 \
-        gpg=2.4.7-21+deb13u1+b2 \
-        ca-certificates=20250419 \
-        openssl=3.5.5-1~deb13u1 \
-        bind9-dnsutils=1:9.20.18-1~deb13u1 \
-        adduser=3.152 \
-        procps=2:4.0.4-9 \
-        tini=0.19.0-3+b6 \
-        tzdata=2026a-0+deb13u1 && \
+        curl \
+        gpg \
+        ca-certificates \
+        openssl \
+        bind9-dnsutils \
+        adduser \
+        procps \
+        tini \
+        tzdata && \
     # Clean up
     apt-get clean && \
     # Delete apt lists
@@ -52,14 +52,11 @@ RUN install -d /etc/apt/keyrings; curl https://repo.powerdns.com/FD380FBB-pub.as
     printf "Package: dnsdist*\nPin: origin repo.powerdns.com\nPin-Priority: 600" > /etc/apt/preferences.d/dnsdist-20 && \
     # Install dnsdist from PowerDNS repository
     apt-get update && \
-    apt-get install -y --no-install-recommends dnsdist=2.0.2-1pdns.debian13 && \
+    apt-get install -y --no-install-recommends dnsdist && \
     # Clean up
     apt-get clean && \
     # Delete apt lists
     rm -rf /var/lib/apt/lists/*
-
-# Set working directory
-WORKDIR /etc/dnsdist
 
 # Set build date argument here, because caching would break otherwise
 # It is set during the build process in the reusable workflow
@@ -75,6 +72,9 @@ LABEL org.opencontainers.image.authors="Bleala" \
       org.opencontainers.image.documentation="https://www.dnsdist.org/install.html" \
       org.opencontainers.image.url="https://hub.docker.com/r/bleala/dnsdist" \
       org.opencontainers.image.source="https://github.com/Bleala/DNSdist-DOCKERIZED"
+
+# Set working directory
+WORKDIR /etc/dnsdist
 
 # DNS
 EXPOSE 53/tcp
