@@ -1,5 +1,5 @@
 # Global variables
-ARG DEBIAN_VERSION="13.5-slim" \
+ARG DEBIAN_VERSION="13.6-slim" \
     DNSDIST_VERSION="2.1.0" \
     IMAGE_VERSION="1.1.0"
 
