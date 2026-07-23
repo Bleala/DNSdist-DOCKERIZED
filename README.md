@@ -6,18 +6,23 @@
 
 ## Versions
 
+**1.1.0 - 23.07.2026:**<br>
+
+* DNSdist update to version 2.1.0
+* Debian Slim update to version 13.6
+
+**Current Versions:**<br>
+
+* DNSdist 2.1.0
+* Debian Slim 13.6
+
+<details>
+<summary>Old Version History</summary><br>
+
 **1.0.1 - 01.07.2026:**<br>
 
 * DNSdist update to version 2.0.7
 * Debian Slim update to version 13.5
-
-**Current Versions:**<br>
-
-* DNSdist 2.0.7
-* Debian Slim 13.5
-
-<details>
-<summary>Old Version History</summary><br>
 
 **1.0.0 - 22.01.2026:**<br>
 
@@ -32,4 +37,3 @@
 ### Hope you enjoy it! :)
 
 ---
- 

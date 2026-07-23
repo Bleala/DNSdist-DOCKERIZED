@@ -1,7 +1,7 @@
 # Global variables
-ARG DEBIAN_VERSION="13.5-slim" \
-    DNSDIST_VERSION="2.0.7" \
-    IMAGE_VERSION="1.0.1"
+ARG DEBIAN_VERSION="13.6-slim" \
+    DNSDIST_VERSION="2.1.0" \
+    IMAGE_VERSION="1.1.0"
 
 # https://www.dnsdist.org/install.html#installing-from-source
 # Set Debian as the base image
@@ -41,15 +41,16 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install dnsdist from PowerDNS repository
+# https://repo.powerdns.com/
     # Add PowerDNS GPG key
 RUN install -d /etc/apt/keyrings; curl https://repo.powerdns.com/FD380FBB-pub.asc | \
-      tee /etc/apt/keyrings/dnsdist-20-pub.asc > /dev/null && \
+      tee /etc/apt/keyrings/dnsdist-21-pub.asc > /dev/null && \
     # Add PDNS repository
     # https://repo.powerdns.com/
-    echo "deb [signed-by=/etc/apt/keyrings/dnsdist-20-pub.asc] http://repo.powerdns.com/debian trixie-dnsdist-20 main" \
+    echo "deb [signed-by=/etc/apt/keyrings/dnsdist-21-pub.asc] http://repo.powerdns.com/debian trixie-dnsdist-21 main" \
       > /etc/apt/sources.list.d/pdns.list && \
     # Set package pinning to prefer PowerDNS packages
-    printf "Package: dnsdist*\nPin: origin repo.powerdns.com\nPin-Priority: 600" > /etc/apt/preferences.d/dnsdist-20 && \
+    printf "Package: dnsdist*\nPin: origin repo.powerdns.com\nPin-Priority: 600" > /etc/apt/preferences.d/dnsdist-21 && \
     # Install dnsdist from PowerDNS repository
     apt-get update && \
     apt-get install -y --no-install-recommends dnsdist && \
