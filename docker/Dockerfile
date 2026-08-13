@@ -1,7 +1,7 @@
 # Global variables
 ARG DEBIAN_VERSION="13.6-slim" \
-    DNSDIST_VERSION="2.1.0" \
-    IMAGE_VERSION="1.1.0"
+    DNSDIST_VERSION="2.1.1" \
+    IMAGE_VERSION="1.1.1"
 
 # https://www.dnsdist.org/install.html#installing-from-source
 # Set Debian as the base image
