@@ -21,7 +21,7 @@ ENV TZ="Europe/Vienna"
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD nslookup -type=NS -timeout=1 -retry=1 . 127.0.0.1 || exit 1
+  CMD ["sh", "-c", "nslookup -type=NS -timeout=1 -retry=1 . 127.0.0.1 || exit 1"]
 
 # Install runtime dependencies
 RUN apt-get update && \
