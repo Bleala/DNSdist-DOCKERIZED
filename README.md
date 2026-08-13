@@ -9,6 +9,7 @@
 **1.1.1 - 13.08.2026:**<br>
 
 * DNSdist update to version 2.1.1
+* Trivy update to version 0.73.0
 
 **Current Versions:**<br>
 
