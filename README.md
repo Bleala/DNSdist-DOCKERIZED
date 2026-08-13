@@ -6,18 +6,23 @@
 
 ## Versions
 
-**1.1.0 - 23.07.2026:**<br>
+**1.1.1 - 13.08.2026:**<br>
 
-* DNSdist update to version 2.1.0
-* Debian Slim update to version 13.6
+* DNSdist update to version 2.1.1
+* Trivy update to version 0.73.0
 
 **Current Versions:**<br>
 
-* DNSdist 2.1.0
+* DNSdist 2.1.1
 * Debian Slim 13.6
 
 <details>
 <summary>Old Version History</summary><br>
+
+**1.1.0 - 23.07.2026:**<br>
+
+* DNSdist update to version 2.1.0
+* Debian Slim update to version 13.6
 
 **1.0.1 - 01.07.2026:**<br>
 

@@ -184,11 +184,11 @@ jobs:
         id: trivy-scan
         run: |
           # Pin Trivy Version
-          TRIVY_VERSION="0.72.0"
+          TRIVY_VERSION="0.73.0"
 
           # Pin Trivy Version SHA
           # create with "sha256sum $FILENAME"
-          EXPECTED_HASH="9bf8aba92f524b74f8e83d53b298a7dfc6b4d60aca779217e7817e5433c73eeb"
+          EXPECTED_HASH="eedaeac48a2e3ac8054f5fa1db36caafd5033dc60d286fef269c06a2468420c0"
           FILE_NAME="trivy_${TRIVY_VERSION}_Linux-64bit.deb"
           DOWNLOAD_URL="https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/${FILE_NAME}"
 
